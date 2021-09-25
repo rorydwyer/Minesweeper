@@ -2,7 +2,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const grid = document.querySelector(".grid");
   let width = 10;
   let bombAmount = 20;
+  let flags = 0;
   let squares = [];
+  let isGameOver = false;
 
   // Create Board
   function createBoard() {
@@ -60,6 +62,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Click on square actions
   function click(square) {
+    let currentId = square.id;
+
     // Break if game is over
     if (isGameOver) return;
 
@@ -67,8 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (square.classList.contains("checked") || square.classList.contains("flag")) return;
 
     if (square.classList.contains("bomb")) {
-      //   alert("Game Over!");
-      console.log("Game Over!");
+      gameOver(square);
     } else {
       let total = square.getAttribute("data");
       if (total != 0) {
@@ -76,9 +79,89 @@ document.addEventListener("DOMContentLoaded", () => {
         square.innerHTML = total;
         return;
       }
-      square.classList.add("checked");
+      checkSquare(square, currentId);
+    }
+    square.classList.add("checked");
+  }
+
+  // Check neighboring squares once square is clicked
+  function checkSquare(square, currentId) {
+    const isLeftEdge = currentId % width === 0;
+    const isRightEdge = currentId % width === width - 1;
+
+    setTimeout(() => {
+      // top
+      if (currentId > width) {
+        const newId = squares[parseInt(currentId) - width].id;
+        const newSquare = document.getElementById(newId);
+        click(newSquare);
+      }
+      // top-right
+      if (currentId > width - 1 && !isRightEdge) {
+        const newId = squares[parseInt(currentId) + 1 - width].id;
+        const newSquare = document.getElementById(newId);
+        click(newSquare);
+      }
+      // right
+      if (currentId < squares.length && !isRightEdge) {
+        const newId = squares[parseInt(currentId) + 1].id;
+        const newSquare = document.getElementById(newId);
+        click(newSquare);
+      }
+      // bottom-right
+      if (currentId < squares.length - width - 1 && !isRightEdge) {
+        const newId = squares[parseInt(currentId) + 1 + width].id;
+        const newSquare = document.getElementById(newId);
+        click(newSquare);
+      }
+      // bottom
+      if (currentId < squares.length - width - 1) {
+        const newId = squares[parseInt(currentId) + width].id;
+        const newSquare = document.getElementById(newId);
+        click(newSquare);
+      }
+      // bottom-left
+      if (currentId < squares.length - width && !isLeftEdge) {
+        const newId = squares[parseInt(currentId) - 1 + width].id;
+        const newSquare = document.getElementById(newId);
+        click(newSquare);
+      }
+      // left
+      if (currentId > 0 && !isLeftEdge) {
+        const newId = squares[parseInt(currentId) - 1].id;
+        const newSquare = document.getElementById(newId);
+        click(newSquare);
+      }
+      // top-left
+      if (currentId > width + 1 && !isLeftEdge) {
+        const newId = squares[parseInt(currentId) - 1 - width].id;
+        const newSquare = document.getElementById(newId);
+        click(newSquare);
+      }
+    }, 10);
+  }
+
+  // Add Flag to square
+  function addFlag(square) {
+    if (isGameOver) return;
+    if (!square.classList.contains("checked") && flags < bombAmount) {
     }
   }
 
+  // Game over
+  function gameOver(square) {
+    console.log("BOOM! Game Over!");
+    square.innerHTML = "💥";
+    isGameOver = true;
+
+    // Show all the bombs
+    squares.forEach((square) => {
+      if (square.classList.contains("bomb")) {
+        square.innerHTML = "💣";
+      }
+    });
+  }
+
+  // Init game
   createBoard();
 });
