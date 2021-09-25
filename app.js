@@ -26,6 +26,12 @@ document.addEventListener("DOMContentLoaded", () => {
       square.addEventListener("click", (e) => {
         click(square);
       });
+
+      // Ctrl & Left Click
+      square.oncontextmenu = (e) => {
+        e.preventDefault();
+        addFlag(square);
+      };
     }
 
     // Add numbers
@@ -145,6 +151,15 @@ document.addEventListener("DOMContentLoaded", () => {
   function addFlag(square) {
     if (isGameOver) return;
     if (!square.classList.contains("checked") && flags < bombAmount) {
+      if (!square.classList.contains("flag")) {
+        square.classList.add("flag");
+        square.innerHTML = "🚩";
+        flags++;
+      } else {
+        square.classList.remove("flag");
+        square.innerHTML = "";
+        flags--;
+      }
     }
   }
 
