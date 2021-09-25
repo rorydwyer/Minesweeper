@@ -7,10 +7,15 @@
 }
 
 .grid div {
+  text-align: center;
   height: 40px;
   width: 40px;
 }
 
 .bomb {
   background-color: coral;
+}
+
+.checked {
+  background-color: yellowgreen;
 }
